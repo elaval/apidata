@@ -1,0 +1,13 @@
+{
+  "name": "apidata",
+  "version": "1.0.0",
+  "description": "Node.js on Docker",
+  "author": "Ernesto Laval <ernesto.laval@gmail.com>",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.15.0"
+  }
+}
