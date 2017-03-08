@@ -8,6 +8,12 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.15.0"
+    "body-parser": "^1.17.1",
+    "cors": "^2.8.1",
+    "express": "^4.15.0",
+    "express-bearer-token": "^2.1.0",
+    "mongoose": "^4.8.6",
+    "morgan": "^1.8.1",
+    "underscore": "^1.8.3"
   }
 }
