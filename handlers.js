@@ -8,9 +8,11 @@ let _ = require("underscore")
  * - req.user.username contains a valid user identification 
  */
 
+
 let numericFields = {
     region:true,
-    ruralidad:true
+    ruralidad:true,
+    enseñanza:true
 }
 
 var School   = require('./models/school'); // get our mongoose model
@@ -25,38 +27,39 @@ function schools(req, res) {
 }; 
 
 
-function test(req, res) {
+function education(req, res) {
 
   console.log(req.query);
 
   let matchFields = {};
+  let groupFields = {};
+  let groupQuery = {};
+
   _.each(req.query, (value,key) => {
       if (key !== "by") {
           matchFields[key] = numericFields[key] ? +value :value;
+      } else if (key == "by") {
+          let fields = value.split(",")
+          _.each(fields, (field) => {
+            groupFields[field] = "$"+field;
+          })
+          
       }
   })
 
+  groupQuery['_id'] = groupFields;
+  _.each(groupFields, (value,key) => {
+    groupQuery[key] = { $first: value }
+  })
 
-  console.log(matchFields);
+  for (let i of [2007,2008,2009,2010,2011,2012,2013,2014,2015,2016]) {
+    groupQuery['matricula'+i] = { $sum: `$matricula${i}.total`  };
+  }
+  
 
   School.aggregate([
     { $match: matchFields },
-
-    { $group: {
-            _id: {comuna:"$comuna", dependencia:"$dependencia"},
-
-            comuna: { $first: "$comuna"  },
-            dependencia: { $first: "$dependencia"  },
-            matricula2016: { $sum: "$matricula2016.total"  },
-            matricula2015: { $sum: "$matricula2015.total"  },
-            matricula2014: { $sum: "$matricula2014.total"  },
-            matricula2013: { $sum: "$matricula2013.total"  },
-            matricula2012: { $sum: "$matricula2012.total"  },
-            matricula2011: { $sum: "$matricula2011.total"  },
-            matricula2010: { $sum: "$matricula2010.total"  },
-            matricula2009: { $sum: "$matricula2009.total"  },
-            matricula2008: { $sum: "$matricula2008.total"  },
-    }},
+    { $group: groupQuery },
     { $sort: { "comuna": 1, "dependencia":1} }
   ], function(err, result) {
     res.json(result);
@@ -64,28 +67,9 @@ function test(req, res) {
   
 }; 
 
-/*
-    AccountModel.aggregate([
-        { $match: {
-            _id: accountId
-        }},
-        { $unwind: "$records" },
-        { $group: {
-            _id: "$_id",
-            balance: { $sum: "$records.amount"  }
-        }}
-    ], function (err, result) {
-        if (err) {
-            console.log(err);
-            return;
-        }
-        console.log(result);
-    });
-    */
-
 
 // set up a mongoose model and pass it using module.exports
 module.exports = {
     "schools": schools, 
-    "test": test, 
+    "education": education, 
 };

@@ -15,6 +15,8 @@ var mongoDb = process.env.MONGO_DATABASE || config.database;
 console.log(mongoDb)
 mongoose.connect(mongoDb); // connect to database
 
+let port = 8021;
+
 app.use(morgan('dev'));
 app.options('*', cors()); // to allow pre-flight cors 
 
@@ -31,12 +33,12 @@ app.get('/schools', function (req, res) {
   schoolHandlers.schools(req,res);
 });
 
-app.get('/test', function (req, res) {
-  schoolHandlers.test(req,res);
+app.get('/education', function (req, res) {
+  schoolHandlers.education(req,res);
 });
 
 
 
-app.listen(8021, function () {
-  console.log('Example app listening on port 8021!');
+app.listen(port, function () {
+  console.log(`Listening on port ${port}!`);
 });
