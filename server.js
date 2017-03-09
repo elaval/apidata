@@ -12,6 +12,7 @@ var config = require('./config'); // get our config file
 var schoolHandlers = require('./handlers')
 
 var mongoDb = process.env.MONGO_DATABASE || config.database;
+console.log(mongoDb)
 mongoose.connect(mongoDb); // connect to database
 
 app.use(morgan('dev'));
@@ -37,5 +38,5 @@ app.get('/test', function (req, res) {
 
 
 app.listen(8021, function () {
-  console.log('Example app listening on port 3000!');
+  console.log('Example app listening on port 8021!');
 });
