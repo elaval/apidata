@@ -18,6 +18,7 @@ mongoose.connect(mongoDb); // connect to database
 let port = 8021;
 
 app.use(morgan('dev'));
+app.use(cors());
 app.options('*', cors()); // to allow pre-flight cors 
 
 
