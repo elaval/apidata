@@ -55,7 +55,21 @@ function education(req, res) {
   for (let i of [2007,2008,2009,2010,2011,2012,2013,2014,2015,2016]) {
     groupQuery['matricula'+i] = { $sum: `$matricula${i}.total`  };
   }
+
+  groupQuery['count'] = { $sum: 1  }
   
+  /*
+  [
+  {$match: {'comuna':'TEMUCO'}},
+  {$group: {
+    '_id': {dependencia:'$dependencia'},
+    'dependencia': {$first:'$dependencia'},
+    'matricula2016': {$sum:'$matricula2016.total'},
+    'matricula2015': {$sum:'$matricula2015.total'},
+    'count': {$sum:1}
+  }}
+  ]
+*/
 
   School.aggregate([
     { $match: matchFields },
