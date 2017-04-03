@@ -65,6 +65,10 @@ function education(req, res) {
 
   for (let i of [2007,2008,2009,2010,2011,2012,2013,2014,2015,2016]) {
     groupQuery['matricula'+i] = { $sum: `$matricula${i}.total`  };
+    groupQuery['matricula'+i+'_mediaTPTot'] = { $sum: `$matricula${i}.mediaTPTot`  };
+    groupQuery['matricula'+i+'_mediaHCTot'] = { $sum: `$matricula${i}.mediaHCTot`  };
+    groupQuery['matricula'+i+'_basicaTot'] = { $sum: `$matricula${i}.basicaTot`  };
+    groupQuery['matricula'+i+'_parvulariaTot'] = { $sum: `$matricula${i}.parvulariaTot`  };
     projectFields['matricula'+i] = 1;
   }
 
@@ -76,55 +80,23 @@ function education(req, res) {
   
   /*
   [
+  $project : {
+    'establecimientosFuncionando': {'$cond': [ { $eq: [ "$_id.estado", 1 ] }, "$count", 0 ]},
+    'establecimientosEnReceso': {'$cond': [ { $eq: [ "$_id.estado", 2 ] }, "$count", 0 ]},
+    'establecimientosCerrados': {'$cond': [ { $eq: [ "$_id.estado", 3 ] }, "$count", 0 ]},
+    'establecimientosAturizadoSinMatricula': {'$cond': [ { $eq: [ "$_id.estado", 4 ] }, "$count", 0 ]},
+  },
   {$match: {'comuna':'TEMUCO'}},
   {$group: {
     '_id': {dependencia:'$dependencia'},
     'dependencia': {$first:'$dependencia'},
     'matricula2016': {$sum:'$matricula2016.total'},
     'matricula2015': {$sum:'$matricula2015.total'},
-    'count': {$sum:1}
+    'establecimientosFuncionando': {$sum:'establecimientosFuncionando'},
+    ...
   }}
   ]
 */
-
-/*
-[
-{$match: {'comuna':'TEMUCO'}},
-{$group: {
-'_id': {
-	dependencia:'$dependencia', 
-	estado:'$estado'
-	},
-
-'dependencia': {$first:'$dependencia'},
-'matricula': {$sum:'$matricula2016.total'},
-'count': {$sum:1}
-
-}},
-{
-$project : {
-	'escuelasOperando': {'$cond': [ { $eq: [ "$_id.estado", 1 ] }, "$count", 0 ]},
-	'dependencia':1,
-	'matricula':1
-}
-},
-
-{$group : {
-
-'_id': {
-	dependencia:'$dependencia'
-		},
-
-'dependencia': {$first:'$dependencia'},
-'matricula': {$sum:'$matricula'},
-'count': {$sum: '$escuelasOperando'}
-}
-}
-
-
-]
-*/
-
 
   const aggregateJSON = [
     { $match: matchFields },
