@@ -12,7 +12,8 @@ let _ = require("underscore")
 let numericFields = {
     region:true,
     ruralidad:true,
-    enseñanza:true
+    enseñanza:true,
+    estado:true
 }
 
 var School   = require('./models/school'); // get our mongoose model
@@ -34,6 +35,7 @@ function education(req, res) {
   let matchFields = {};
   let groupFields = {};
   let groupQuery = {};
+  let projectFields = {};
 
   _.each(req.query, (value,key) => {
       if (key !== "by") {
@@ -52,11 +54,25 @@ function education(req, res) {
     groupQuery[key] = { $first: value }
   })
 
+  projectFields['establecimientosFuncionando'] = {'$cond': [ { $eq: [ "$estado", 1 ] }, 1, 0 ]};
+  projectFields['establecimientosEnReceso'] = {'$cond': [ { $eq: [ "$estado", 2 ] }, 1, 0 ]};
+  projectFields['establecimientosCerrados'] = {'$cond': [ { $eq: [ "$estado", 3 ] }, 1, 0 ]};
+  projectFields['establecimientosAturizadoSinMatricula'] = {'$cond': [ { $eq: [ "$estado", 4 ] }, 1, 0 ]};
+
+  _.each(groupFields, (value,key) => {
+    projectFields[key] = 1;
+  } )
+
   for (let i of [2007,2008,2009,2010,2011,2012,2013,2014,2015,2016]) {
     groupQuery['matricula'+i] = { $sum: `$matricula${i}.total`  };
+    projectFields['matricula'+i] = 1;
   }
 
-  groupQuery['count'] = { $sum: 1  }
+  groupQuery['establecimientosFuncionando'] = { $sum: `$establecimientosFuncionando`  };
+  groupQuery['establecimientosEnReceso'] = { $sum: `$establecimientosEnReceso`  };
+  groupQuery['establecimientosCerrados'] = { $sum: `$establecimientosCerrados`  };
+  groupQuery['establecimientosAturizadoSinMatricula'] = { $sum: `$establecimientosAturizadoSinMatricula`  };
+
   
   /*
   [
@@ -71,12 +87,57 @@ function education(req, res) {
   ]
 */
 
-  School.aggregate([
+/*
+[
+{$match: {'comuna':'TEMUCO'}},
+{$group: {
+'_id': {
+	dependencia:'$dependencia', 
+	estado:'$estado'
+	},
+
+'dependencia': {$first:'$dependencia'},
+'matricula': {$sum:'$matricula2016.total'},
+'count': {$sum:1}
+
+}},
+{
+$project : {
+	'escuelasOperando': {'$cond': [ { $eq: [ "$_id.estado", 1 ] }, "$count", 0 ]},
+	'dependencia':1,
+	'matricula':1
+}
+},
+
+{$group : {
+
+'_id': {
+	dependencia:'$dependencia'
+		},
+
+'dependencia': {$first:'$dependencia'},
+'matricula': {$sum:'$matricula'},
+'count': {$sum: '$escuelasOperando'}
+}
+}
+
+
+]
+*/
+
+
+  const aggregateJSON = [
     { $match: matchFields },
+    { $project : projectFields },
     { $group: groupQuery },
     { $sort: { "comuna": 1, "dependencia":1} }
-  ], function(err, result) {
-    res.json(result);
+  ];
+
+  console.log(aggregateJSON);
+
+  School.aggregate(aggregateJSON
+    , function(err, result) {
+    res.json(result)
   });
   
 }; 
