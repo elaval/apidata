@@ -9,6 +9,9 @@ var bearerToken = require("express-bearer-token");
 var cors = require('cors')
 var config = require('./config'); // get our config file
 
+// Use native promises
+mongoose.Promise = global.Promise;
+
 var schoolHandlers = require('./handlers')
 var comunaHandlers = require('./handlersComunas')
 var regionHandlers = require('./handlersRegion')
@@ -59,6 +62,15 @@ app.get('/region/:region', function (req, res) {
 
 app.get('/pais', function (req, res) {
   regionHandlers.getPais(req,res);
+});
+
+app.get('/pais/history', function (req, res) {
+  regionHandlers.getPaisHistory(req,res);
+});
+
+
+app.get('/matricula', function (req, res) {  
+  regionHandlers.matriculaHandler(req,res);
 });
 
 app.listen(port, function () {
