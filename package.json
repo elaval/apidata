@@ -12,6 +12,9 @@
     "cors": "^2.8.1",
     "express": "^4.15.0",
     "express-bearer-token": "^2.1.0",
+    "greenlock": "^2.1.15",
+    "greenlock-express": "^2.0.11",
+    "letsencrypt-express": "^2.0.6",
     "mongoose": "^4.8.6",
     "morgan": "^1.8.1",
     "underscore": "^1.8.3"
