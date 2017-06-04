@@ -73,8 +73,14 @@ app.get('/matricula', function (req, res) {
   regionHandlers.matriculaHandler(req,res);
 });
 
-if (process.env.MONGO_DATABASE && process.env.MONGO_DATABASE === 'true') {
- 
+if (process.env.NO_HTTPS && process.env.NO_HTTPS === 'true') {
+  
+  app.listen(port, function () {
+    console.log(`Listening on port ${port}!`);
+  });
+  
+} else {
+
   // returns an instance of node-greenlock with additional helper methods 
   var lex = require('greenlock-express').create({
     // set to https://acme-v01.api.letsencrypt.org/directory in production 
@@ -128,12 +134,6 @@ if (process.env.MONGO_DATABASE && process.env.MONGO_DATABASE === 'true') {
     console.log("Listening for ACME tls-sni-01 challenges and serve app on", this.address());
   });
 
-} else {
-
-  app.listen(port, function () {
-    console.log(`Listening on port ${port}!`);
-  });
-  
 }
 
 
